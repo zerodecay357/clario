@@ -25,7 +25,9 @@ export async function GET(request: Request) {
         const [first] = (await res.json()) as [{ error: boolean; data?: { sitename: string } }];
         return { instance, ok: !first.error, sitename: first.data?.sitename, ms: Date.now() - started };
       } catch (err) {
-        return { instance, ok: false, error: String(err), ms: Date.now() - started };
+        // undici hides the real reason (DNS, TCP reset, TLS…) in `cause`.
+        const cause = (err as { cause?: { code?: string; message?: string } }).cause;
+        return { instance, ok: false, error: String(err), cause: cause?.code ?? cause?.message, ms: Date.now() - started };
       }
     }),
   );
