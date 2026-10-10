@@ -31,4 +31,4 @@ Priority: 🔴 critical · 🟠 important · 🟡 later
 | D7 | 🟡 | Background job tools (Inngest/Trigger.dev) instead of a cron loop: one job per user per source | Timeouts, retries, isolation | open |
 | D8 | 🟡 | **Source health monitoring**: last success per connector, error-rate alerts | Notice broken scrapers before users do | open |
 | D9 | 🟡 | Mobile app (Expo) once the web app is stable; app notifications are the digest channel | The user's chosen direction: "the app shows everything" | roadmap |
-| D10 | 🟡 | Security review of token/password handling before opening to people beyond friends | R1/R2/R6 | before public launch |
+| D10 | 🟡 | Security review of token/password handling before opening to people beyond friends. Includes **rotating `CRON_SECRET`** (it appeared in a chat log on 2026-10-10) | R1/R2/R6 | before public launch |
