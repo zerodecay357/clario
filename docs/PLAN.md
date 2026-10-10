@@ -33,7 +33,18 @@ Push through as many stages as possible today. **After each stage there is a man
 
 The Stage 0–2 details are in the "v0 scope" section below (it maps to Stages 1–2; Stage 0 is scaffolding, auth and deploy).
 
+## Current status (end of session 2026-10-10)
+- **Stage 0 ≈ 90 %, not tagged.** Live at https://clario-smoky.vercel.app (Vercel, region still `iad1`). Supabase project `tjvuoodrfgvcxxhotqrt` (email magic link on; Google off, see `NEXT_PUBLIC_GOOGLE_AUTH`).
+- Live checks passed: landing 200, `/login` 200, health route returns 401 without the secret, no `.env.local` on GitHub, **moodlenew reachable from Vercel** ✅.
+- **Open before tagging v0.0:**
+  1. ❌ **GitHub repo is PUBLIC.** Switch it to Private (Settings → Change visibility).
+  2. ❌ **Old Moodle is unreachable from Vercel (`ENOTFOUND`).** See the verified facts below. The user believes it works without IITD WiFi → **test on mobile data with no VPN**: open `https://moodle.iitd.ac.in` and note the final URL. Then decide how to sync old Moodle (options: browser-side sync on campus/VPN *(recommended if campus-only)*, campus relay, or moodlenew-only until the Stage 3 extension).
+  3. Switch the Vercel Function Region to `bom1` (Mumbai) and redeploy.
+  4. Add the Vercel URL to Supabase Auth → URL Configuration (Site URL + `https://clario-smoky.vercel.app/**`); test magic-link login live and on localhost.
+- Then: tag `v0.0`, finalize `devlog/stage-0.md`, start Stage 1.
+
 ## Verified facts (checked 2026-10-10)
+- **DNS:** `moodlenew.iitd.ac.in` is public (`103.27.8.65`). **`moodle.iitd.ac.in` is NXDOMAIN on public DNS** (Cloudflare DoH, SOA `dns8.iitd.ac.in`) and resolves to the private address `10.10.17.1` on the campus network. Vercel health check: moodle `ENOTFOUND`, moodlenew OK (~1.2 s from iad1). Not yet confirmed by an off-campus browser test (the user disputes it).
 - `moodle.iitd.ac.in` ("2025-2026") and `moodlenew.iitd.ac.in` ("2025-2026 (NEW)") both report `enablewebservices=1`, `enablemobilewebservice=1`, `typeoflogin=1`. So `POST /login/token.php?service=moodle_mobile_app` (username, password) → `wstoken`. This API route doesn't hit the CAPTCHA on the website login form (to confirm with a real login).
 - Both send `Access-Control-Allow-Origin: *` on `token.php` and `webservice/rest/server.php`, so **the browser does the token exchange directly; the password never reaches Clario's servers.**
 - Both serve a GlobalSign cert **without the intermediate** (openssl verify code 21). Browsers cope, but Node `fetch` fails. Fix: bundle the "GlobalSign GCC R46 OV TLS CA 2025" intermediate PEM in the repo and pass it via an undici `Agent({ connect: { ca } })` for Moodle calls (or `NODE_EXTRA_CA_CERTS`). Never turn off certificate checking.
