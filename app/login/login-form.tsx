@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+// Hidden until the Google provider is enabled in Supabase (Auth → Providers).
+const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "1";
+
 export function LoginForm() {
   const params = useSearchParams();
   const [email, setEmail] = useState("");
@@ -36,6 +39,8 @@ export function LoginForm() {
 
   return (
     <div className="flex flex-col gap-4">
+      {GOOGLE_ENABLED && (
+        <>
       <button
         onClick={signInWithGoogle}
         className="h-11 rounded-xl border border-black/10 font-medium transition hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
@@ -45,6 +50,8 @@ export function LoginForm() {
       <div className="flex items-center gap-3 text-xs text-zinc-500">
         <span className="h-px flex-1 bg-black/10 dark:bg-white/10" /> or <span className="h-px flex-1 bg-black/10 dark:bg-white/10" />
       </div>
+        </>
+      )}
       <form onSubmit={sendMagicLink} className="flex flex-col gap-3">
         <input
           type="email"
